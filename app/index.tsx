@@ -1,7 +1,9 @@
+import ModeSelector from "@/components/ModeSelector";
+import TouchIndicator from "@/components/TouchIndicator";
 import * as Haptics from "expo-haptics";
 import React, { useEffect, useRef, useState } from "react";
 import { GestureResponderEvent, View } from "react-native";
-import TouchIndicator from "../components/TouchIndicator";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
   const [touches, setTouches] =
@@ -70,6 +72,9 @@ export default function Index() {
       {touches.map((t) => (
         <TouchIndicator key={t.identifier} x={t.pageX} y={t.pageY} />
       ))}
+      <SafeAreaView>
+        <ModeSelector />
+      </SafeAreaView>
     </View>
   );
 }

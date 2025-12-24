@@ -7,7 +7,7 @@
     scale: 1;
   }
   50% {
-    scale: 1.25;
+    scale: 1.2;
   }
   to {
     scale: 1;
@@ -15,5 +15,5 @@
 }
 
 .scale {
-  animation: scale 2s ease-in-out infinite;
+  animation: scale 2.5s ease-in-out infinite;
 }

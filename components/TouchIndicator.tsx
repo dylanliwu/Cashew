@@ -15,7 +15,7 @@ export default function TouchIndicator({ x, y }: TouchIndicatorProps) {
         top: y - 50,
       }}
     >
-      <View className="w-[100px] h-[100px] rounded-full bg-white scale" />
+      <View className="w-[100px] h-[100px] rounded-full bg-white scale border-4" />
     </View>
   );
 }
