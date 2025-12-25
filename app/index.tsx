@@ -73,7 +73,12 @@ export default function Index() {
         <TouchIndicator key={t.identifier} x={t.pageX} y={t.pageY} />
       ))}
       <SafeAreaView>
-        <ModeSelector />
+        <View
+          onStartShouldSetResponder={() => true}
+          onTouchStart={(e) => e.stopPropagation()}
+        >
+          <ModeSelector />
+        </View>
       </SafeAreaView>
     </View>
   );
