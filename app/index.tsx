@@ -1,36 +1,60 @@
 import ModeSelector from "@/components/ModeSelector";
 import TouchIndicator from "@/components/TouchIndicator";
+import {
+  PULSE_DURATION,
+  pulseProgress,
+  pulseRunning,
+} from "@/lib/animationClock";
 import * as Haptics from "expo-haptics";
 import React, { useEffect, useRef, useState } from "react";
 import { GestureResponderEvent, View } from "react-native";
+import { withRepeat, withTiming } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
-  const [touches, setTouches] =
-    useState<GestureResponderEvent["nativeEvent"]["touches"]>([]);
+  const [touches, setTouches] = useState<any[]>([]);
   const [chosenId, setChosenId] = useState<number | null>(null);
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const prevTouchCount = useRef(0);
 
-  const onTouchesStable = () => {
-    setTouches((prev) => {
-      if (prev.length <= 1) return prev;
+  useEffect(() => {
+    if (touches.length > 0 && !pulseRunning.value) {
+      pulseRunning.value = true;
+      pulseProgress.value = withRepeat(
+        withTiming(1, { duration: PULSE_DURATION }),
+        -1,
+        false
+      );
+    }
 
-      const i = Math.floor(Math.random() * prev.length);
-      setChosenId(Number(prev[i].identifier));
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-
-      return [prev[i]];
-    });
-  };
+    if (touches.length === 0) {
+      pulseRunning.value = false;
+      pulseProgress.value = 0;
+      setChosenId(null);
+      prevTouchCount.current = 0;
+    }
+  }, [touches.length]);
 
   useEffect(() => {
     if (touches.length > prevTouchCount.current) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
+
     prevTouchCount.current = touches.length;
   }, [touches.length]);
+
+  const onTouchesStable = () => {
+    setTouches((prev) => {
+      if (prev.length <= 1) return prev;
+
+      const chosen = prev[Math.floor(Math.random() * prev.length)];
+      setChosenId(chosen.identifier);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+
+      return [chosen];
+    });
+  };
 
   useEffect(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -41,20 +65,14 @@ export default function Index() {
   }, [touches.length, chosenId]);
 
   const handleTouches = (evt: GestureResponderEvent) => {
-    const incoming = evt.nativeEvent.touches;
+    const incoming = evt.nativeEvent.touches as any[];
 
     if (chosenId !== null) {
       const chosenTouch = incoming.find(
-        (t) => Number(t.identifier) === chosenId
+        (t) => t.identifier === chosenId
       );
 
-      if (chosenTouch) {
-        setTouches([chosenTouch]);
-      } else {
-        setTouches([]);
-        setChosenId(null);
-        prevTouchCount.current = 0;
-      }
+      setTouches(chosenTouch ? [chosenTouch] : []);
       return;
     }
 
@@ -70,8 +88,13 @@ export default function Index() {
       onTouchCancel={handleTouches}
     >
       {touches.map((t) => (
-        <TouchIndicator key={t.identifier} x={t.pageX} y={t.pageY} />
+        <TouchIndicator
+          key={t.identifier}
+          x={t.pageX}
+          y={t.pageY}
+        />
       ))}
+
       <SafeAreaView>
         <View
           onStartShouldSetResponder={() => true}

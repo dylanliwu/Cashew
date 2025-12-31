@@ -2,18 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-@keyframes scale {
-  from {
-    scale: 1;
+@keyframes scalePulse {
+  0% {
+    transform: scale(1);
   }
   50% {
-    scale: 1.2;
+    transform: scale(1.2);
   }
-  to {
-    scale: 1;
+  100% {
+    transform: scale(1);
   }
 }
 
 .scale {
-  animation: scale 2.5s ease-in-out infinite;
+  animation: scalePulse 2.5s ease-in-out infinite;
 }

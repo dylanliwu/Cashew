@@ -1,21 +1,43 @@
-import React from "react";
-import { View } from "react-native";
+import { pulseProgress } from "@/lib/animationClock";
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+} from "react-native-reanimated";
 
-type TouchIndicatorProps = {
+export default function TouchIndicator({
+  x,
+  y,
+}: {
   x: number;
   y: number;
-};
+}) {
+  const animatedStyle = useAnimatedStyle(() => {
+    const scale = interpolate(
+      pulseProgress.value,
+      [0, 0.5, 1],
+      [1, 1.2, 1]
+    );
 
-export default function TouchIndicator({ x, y }: TouchIndicatorProps) {
+    return {
+      transform: [{ scale }],
+    };
+  });
+
   return (
-    <View
-      className="absolute"
-      style={{
-        left: x - 50,
-        top: y - 50,
-      }}
-    >
-      <View className="w-[100px] h-[100px] rounded-full bg-white scale border-[6px]" />
-    </View>
+    <Animated.View
+      style={[
+        animatedStyle,
+        {
+          position: "absolute",
+          left: x - 62.5,
+          top: y - 62.5,
+          width: 125,
+          height: 125,
+          borderRadius: 62.5,
+          backgroundColor: "white",
+          borderWidth: 6,
+        },
+      ]}
+    />
   );
 }

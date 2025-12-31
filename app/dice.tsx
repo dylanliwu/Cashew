@@ -3,33 +3,37 @@ import React, { useRef, useState } from "react";
 import { Animated, PanResponder, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ModeSelector from "../components/ModeSelector";
-
-// Phosphor dice icons
 import {
-    DiceFiveIcon,
-    DiceFourIcon,
-    DiceOneIcon,
-    DiceSixIcon,
-    DiceThreeIcon,
-    DiceTwoIcon,
+  DiceFiveIcon,
+  DiceFourIcon,
+  DiceOneIcon,
+  DiceSixIcon,
+  DiceThreeIcon,
+  DiceTwoIcon,
 } from "phosphor-react-native";
 
-const diceIcons = [DiceOneIcon, DiceTwoIcon, DiceThreeIcon, DiceFourIcon, DiceFiveIcon, DiceSixIcon];
+const diceIcons = [
+  DiceOneIcon,
+  DiceTwoIcon,
+  DiceThreeIcon,
+  DiceFourIcon,
+  DiceFiveIcon,
+  DiceSixIcon,
+];
 
 export default function Dice() {
   const [currentDice, setCurrentDice] = useState(5);
+  const [isRolling, setIsRolling] = useState(false);
+
   const spinAnim = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(0)).current;
-  const [isRolling, setIsRolling] = useState(false);
 
   const panResponder = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponder: (evt, { dy }) => Math.abs(dy) > 10,
+      onMoveShouldSetPanResponder: (_, { dy }) => Math.abs(dy) > 10,
       onPanResponderMove: () => {},
-      onPanResponderRelease: (evt, { dy }) => {
-        if (dy < -50 && !isRolling) {
-          rollDice();
-        }
+      onPanResponderRelease: (_, { dy }) => {
+        if (dy < -50 && !isRolling) rollDice();
       },
     })
   ).current;
@@ -38,15 +42,15 @@ export default function Dice() {
     setIsRolling(true);
     spinAnim.setValue(0);
     translateY.setValue(0);
-    const randomDice = Math.floor(Math.random() * 6);
 
-    // Haptic feedback loop
+    const result = Math.floor(Math.random() * 6);
+
     const hapticInterval = setInterval(() => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     }, 150);
 
     setTimeout(() => {
-      setCurrentDice(randomDice);
+      setCurrentDice(result);
     }, 600);
 
     Animated.parallel([
@@ -86,12 +90,11 @@ export default function Dice() {
   const DiceIcon = diceIcons[currentDice];
 
   return (
-    <View className="flex-1 bg-purple-800" {...panResponder.panHandlers}>
+    <View className="flex-1 bg-blue-800" {...panResponder.panHandlers}>
       <SafeAreaView>
         <ModeSelector />
       </SafeAreaView>
 
-      {/* Animated Dice */}
       <Animated.View
         style={{
           position: "absolute",
@@ -99,23 +102,23 @@ export default function Dice() {
           left: "50%",
           transform: [
             { translateX: -80 },
-            { translateY: Animated.add(translateY, new Animated.Value(-80)) },
+            {
+              translateY: Animated.add(
+                translateY,
+                new Animated.Value(-80)
+              ),
+            },
             { rotate: spin },
           ],
         }}
       >
-        <View>
-          {/* Fill */}
-          <DiceIcon size={160} color="white" weight="fill" />
-
-          {/* Border */}
-          <DiceIcon
-            size={160}
-            color="black"
-            weight="regular"
-            style={{ position: "absolute", top: 0, left: 0 }}
-          />
-        </View>
+        <DiceIcon size={160} color="white" weight="fill" />
+        <DiceIcon
+          size={160}
+          color="black"
+          weight="regular"
+          style={{ position: "absolute", top: 0, left: 0 }}
+        />
       </Animated.View>
     </View>
   );
